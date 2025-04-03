@@ -33,8 +33,16 @@ def vote(request, question_id): # 투표기능
         selected_choice.save()
         return HttpResponseRedirect(reverse('results', args=(question.id,)))
 
-# def reset(request):
-#     if request.method == "POST":
-#         Choice.objects.update(votes=0)
-#         return HttpResponse("All votes have been reset!")  # 또는 리디렉트
-#     return HttpResponse("Invalid request", status=400)
+def reset(request, question_id): #리셋 버튼
+    question = get_object_or_404(Question, pk=question_id)
+    question.choice_set.update(votes=0)
+    return HttpResponseRedirect(reverse('results', args=(question.id,)))
+
+def likes(request, question_id): #좋아요 기능
+    question = get_object_or_404(Question, pk=question_id)
+    if question.like_users.filter(pk=request.user.pk).exists():
+        question.like_users.remove(request.user)
+    else:
+        question.like_users.add(request.user)
+    return HttpResponseRedirect(reverse('results', args=(question.id,)))
+

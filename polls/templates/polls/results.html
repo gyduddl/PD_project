@@ -7,9 +7,10 @@
     {% endfor %}
 </ul>
 
-<!-- <form action="{% url 'reset' %}" method="post">
+<form action="{% url 'reset' question.id %}" method="post">
     {% csrf_token %}
+    <input type="hidden" name="choice" value="{{ question.choice_set.all }}">
     <button type="submit">Reset Votes</button>
-</form> -->
+</form>
 
 <a href="{% url 'detail' question.id %}">vote again?</a>
