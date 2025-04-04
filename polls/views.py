@@ -44,5 +44,5 @@ def likes(request, question_id): #좋아요 기능
         question.like_users.remove(request.user)
     else:
         question.like_users.add(request.user)
-    return HttpResponseRedirect(reverse('results', args=(question.id,)))
+    return HttpResponseRedirect(reverse('detail', args=(question.id,)))
 
