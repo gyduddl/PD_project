@@ -68,3 +68,12 @@ def create(request):
 
         return redirect('detail', question_id=question.id)
     return render(request, 'polls/index.html')
+    
+def delete(request, question_id):
+    question = get_object_or_404(Question, id=question_id)
+
+    # 로그인한 유저가 작성자일 때만 삭제 허용 (보안)
+    if request.user == question.user:
+        question.delete()
+
+    return redirect('index')  # 삭제 후 리디렉트할 페이지
