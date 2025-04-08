@@ -1,4 +1,5 @@
 from django.urls import path
+from django.views.generic import TemplateView
 
 from . import views
 
@@ -9,4 +10,6 @@ urlpatterns = [
     path('<int:question_id>/vote/', views.vote, name='vote'),
     path('<int:question_id>/reset/', views.reset, name='reset'),
     path('<int:question_id>/likes/', views.likes, name='likes'),
+    path('new/', TemplateView.as_view(template_name="polls/new.html"), name='new'),
+    path('create/', views.create, name='create'),
 ]

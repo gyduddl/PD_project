@@ -1,8 +1,9 @@
-from django.shortcuts import get_object_or_404,render
+from django.shortcuts import get_object_or_404,render,redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.urls import reverse
 from .models import Question, Choice
+from django.utils import timezone
 
 def index(request): # 메인 페이지
     latest_question_list = Question.objects.order_by('-pub_date')[:5]
@@ -12,7 +13,9 @@ def index(request): # 메인 페이지
 
 def detail(request, question_id): # 상세 페이지
     question = get_object_or_404(Question, pk=question_id) # question_id에 해당하는 Question를 가져옴.없으면 404 페이지 반환
+    choices = question.choice_set.all()
     print(f"Question ID: {question_id}, Question Text: {question.question_Text}")
+    print("초이스", choices)
     return render(request, 'polls/detail.html', {'question': question}) # polls/detail.html 템플릿을 렌더링하면서 question 객체 전달
 
 def results(request, question_id): # 결과 페이지
@@ -46,3 +49,22 @@ def likes(request, question_id): #좋아요 기능
         question.like_users.add(request.user)
     return HttpResponseRedirect(reverse('detail', args=(question.id,)))
 
+def create(request):
+    if request.method == "POST":
+        question_Text = request.POST.get('title')
+        choice1_text = request.POST.get('choice1')
+        choice2_text = request.POST.get('choice2')
+        user = request.user
+        # 질문 생성
+        question = Question.objects.create(
+            user = user,
+            question_Text = question_Text,
+            pub_date = timezone.now()
+        )
+
+        # 선택지 생성
+        Choice.objects.create(question=question, choice_text=choice1_text)
+        Choice.objects.create(question=question, choice_text=choice2_text)
+
+        return redirect('detail', question_id=question.id)
+    return render(request, 'polls/index.html')
