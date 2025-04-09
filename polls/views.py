@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404,render,redirect
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
 from django.template import loader
 from django.urls import reverse
 from .models import Question, Choice
@@ -7,15 +7,12 @@ from django.utils import timezone
 
 def index(request): # 메인 페이지
     latest_question_list = Question.objects.order_by('-pub_date')[:5]
-    print("Latest Questions:", latest_question_list)
     context = {'latest_question_list': latest_question_list}
     return render(request, 'polls/index.html', context)
 
 def detail(request, question_id): # 상세 페이지
     question = get_object_or_404(Question, pk=question_id) # question_id에 해당하는 Question를 가져옴.없으면 404 페이지 반환
     choices = question.choice_set.all()
-    print(f"Question ID: {question_id}, Question Text: {question.question_Text}")
-    print("초이스", choices)
     return render(request, 'polls/detail.html', {'question': question}) # polls/detail.html 템플릿을 렌더링하면서 question 객체 전달
 
 def results(request, question_id): # 결과 페이지
@@ -77,3 +74,38 @@ def delete(request, question_id):
         question.delete()
 
     return redirect('index')  # 삭제 후 리디렉트할 페이지
+
+def modify(request, question_id):
+    question = get_object_or_404(Question, pk=question_id) 
+    return render(request, 'polls/modify.html', {'question': question}) 
+
+def update(request, question_id):  
+    question = get_object_or_404(Question, pk=question_id)
+
+    if request.user != question.user:
+        return HttpResponseForbidden("You are not authorized to edit this post.") 
+
+    if request.method == 'POST':
+            print(request.POST)
+            question_Text = request.POST.get('title')
+            choice1_text = request.POST.get('choice1')
+            choice2_text = request.POST.get('choice2')
+
+            question.question_Text =question_Text
+            question.pub_date = timezone.now()
+
+            choices = question.choice_set.all()
+
+            if len(choices) >= 1:
+                choices[0].choice_text = choice1_text  # 첫 번째 선택지 업데이트
+                choices[0].save()
+
+            if len(choices) >= 2:
+                choices[1].choice_text = choice2_text  # 두 번째 선택지 업데이트
+                choices[1].save()
+
+            question.save()            
+
+            return redirect('detail', question_id=question.id)
+    return render(request, 'poll/modify.html', {'question': question})
+
