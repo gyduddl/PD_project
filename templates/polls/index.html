@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+<a href="/polls/new/"  class="btn btn-primary">Create페이지로 이동하기</a>
+<a href="{% url 'common:login' %}" class="btn btn-primary">로그인</a>
+<div class="container my-3">
+    <table class="table">
+        <thead>
+            <tr class="table-dark">
+                <th>번호</th>
+                <th>제목</th>
+                <th>좋아요 수</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if latest_question_list %}
+            {% for question in latest_question_list %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td><a href="{% url 'polls:detail' question.id %}">{{ question.question_Text }}</a></td>
+                <td>{{ question.like_users.all|length }}</td>
+            </tr>
+            {% endfor %}
+            {% else %}
+            <tr>
+                <td colspan="3">질문이 없습니다.</td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

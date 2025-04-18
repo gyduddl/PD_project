@@ -4,6 +4,7 @@ from django.template import loader
 from django.urls import reverse
 from .models import Question, Choice
 from django.utils import timezone
+from .forms import QuestionForm
 
 def index(request): # 메인 페이지
     latest_question_list = Question.objects.order_by('-pub_date')[:5]
@@ -31,12 +32,12 @@ def vote(request, question_id): # 투표기능
     else:
         selected_choice.votes += 1
         selected_choice.save()
-        return HttpResponseRedirect(reverse('results', args=(question.id,)))
+        return HttpResponseRedirect(reverse('polls:results', args=(question.id,)))
 
 def reset(request, question_id): #리셋 버튼
     question = get_object_or_404(Question, pk=question_id)
     question.choice_set.update(votes=0)
-    return HttpResponseRedirect(reverse('results', args=(question.id,)))
+    return HttpResponseRedirect(reverse('polls:results', args=(question.id,)))
 
 def likes(request, question_id): #좋아요 기능
     question = get_object_or_404(Question, pk=question_id)
@@ -44,27 +45,28 @@ def likes(request, question_id): #좋아요 기능
         question.like_users.remove(request.user)
     else:
         question.like_users.add(request.user)
-    return HttpResponseRedirect(reverse('detail', args=(question.id,)))
+    return HttpResponseRedirect(reverse('polls:detail', args=(question.id,)))
 
 def create(request):
-    if request.method == "POST":
-        question_Text = request.POST.get('title')
-        choice1_text = request.POST.get('choice1')
-        choice2_text = request.POST.get('choice2')
-        user = request.user
-        # 질문 생성
-        question = Question.objects.create(
-            user = user,
-            question_Text = question_Text,
-            pub_date = timezone.now()
-        )
+    if request.method == 'POST':
+        form = QuestionForm(request.POST)
+        if form.is_valid():
+            question = form.save(commit=False)
+            question.user = request.user
+            question.pub_date = timezone.now()
+            question.save()
 
-        # 선택지 생성
-        Choice.objects.create(question=question, choice_text=choice1_text)
-        Choice.objects.create(question=question, choice_text=choice2_text)
+            # choice1, choice2는 별도로 생성
+            choice1_text = form.cleaned_data.get('choice1')
+            choice2_text = form.cleaned_data.get('choice2')
+            Choice.objects.create(question=question, choice_text=choice1_text)
+            Choice.objects.create(question=question, choice_text=choice2_text)
 
-        return redirect('detail', question_id=question.id)
-    return render(request, 'polls/index.html')
+            return redirect('polls:detail', question_id=question.id)
+    else:
+        form = QuestionForm()
+    context = {'form': form}
+    return render(request, 'polls/new.html', context)
     
 def delete(request, question_id):
     question = get_object_or_404(Question, id=question_id)
@@ -73,39 +75,53 @@ def delete(request, question_id):
     if request.user == question.user:
         question.delete()
 
-    return redirect('index')  # 삭제 후 리디렉트할 페이지
+    return redirect('polls:index')  # 삭제 후 리디렉트할 페이지
 
 def modify(request, question_id):
     question = get_object_or_404(Question, pk=question_id) 
     return render(request, 'polls/modify.html', {'question': question}) 
 
-def update(request, question_id):  
+def update(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
 
     if request.user != question.user:
-        return HttpResponseForbidden("You are not authorized to edit this post.") 
+        return HttpResponseForbidden("You are not authorized to edit this post.")
 
     if request.method == 'POST':
-            print(request.POST)
-            question_Text = request.POST.get('title')
-            choice1_text = request.POST.get('choice1')
-            choice2_text = request.POST.get('choice2')
-
-            question.question_Text =question_Text
+        form = QuestionForm(request.POST)
+        if form.is_valid():
+            question.question_Text = form.cleaned_data.get('question_Text')
             question.pub_date = timezone.now()
+            question.save()
+
+            choice1_text = form.cleaned_data.get('choice1')
+            choice2_text = form.cleaned_data.get('choice2')
 
             choices = question.choice_set.all()
 
             if len(choices) >= 1:
-                choices[0].choice_text = choice1_text  # 첫 번째 선택지 업데이트
+                choices[0].choice_text = choice1_text
                 choices[0].save()
 
             if len(choices) >= 2:
-                choices[1].choice_text = choice2_text  # 두 번째 선택지 업데이트
+                choices[1].choice_text = choice2_text
                 choices[1].save()
 
-            question.save()            
+            return redirect('polls:detail', question_id=question.id)
+    else:
+        # 처음 수정 화면 들어올 때, 기존 데이터 넣어주기
+        initial_data = {
+            'question_Text': question.question_Text,
+        }
+        choices = question.choice_set.all()
+        if len(choices) >= 1:
+            initial_data['choice1'] = choices[0].choice_text
+        if len(choices) >= 2:
+            initial_data['choice2'] = choices[1].choice_text
 
-            return redirect('detail', question_id=question.id)
-    return render(request, 'poll/modify.html', {'question': question})
+        form = QuestionForm(initial=initial_data)
+
+    context = {'form': form, 'question': question}
+    return render(request, 'polls/modify.html', context)
+
 

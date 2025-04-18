@@ -1,7 +1,0 @@
-<form action="{% url 'create' %}" method="post">
-    {% csrf_token %}
-    <p> <input type="text" placeholder="title" name="title"> </p> <!-- question_Text -->
-    <p> <textarea name="choice1" placeholder="첫번째 선택지"> </textarea> </p> <!-- choice_Text -->
-    <p> <textarea name="choice2" placeholder="두번째 선택지"> </textarea> </p>
-    <p> <input type="submit" value="Create"></p>
-</form>

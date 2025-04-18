@@ -1,12 +1,13 @@
-
-<a href="/polls/"><button>메인페이지로 넘어가기</button></a>
-<a href="{% url 'modify' question.id %}"><button>수정하기</button></a>
-
+{% extends 'base.html' %}
+{% block content %}
+<div class="container my-3">
+  <a href="/polls/" class="btn btn-primary">메인페이지로 넘어가기</a>
+<a href="{% url 'polls:modify' question.id %}" class="btn btn-primary">수정하기</a>
 <h1>{{ question.question_Text }}</h1>
 
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
-<form action="{% url 'vote' question.id %}" method="post">
+<form action="{% url 'polls:vote' question.id %}" method="post">
 {% csrf_token %}
 {% for choice in question.choice_set.all %} <!--question 객체에 연결된 모든 choice(선택지)를 가져옴. -->
     <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}"> <!-- id:키값-->
@@ -14,11 +15,11 @@
 {% endfor %}
 <input type="submit" value="Vote">
 </form>
-<form action="{% url 'delete' question.id %}" method="post" style="display:inline;">
+<form action="{% url 'polls:delete' question.id %}" method="post" style="display:inline;">
   {% csrf_token %}
   <button type="submit">삭제</button>
 </form>
-<form action="{% url 'likes' question.id %}" method="post">
+<form action="{% url 'polls:likes' question.id %}" method="post">
     {% csrf_token %}
     {% if user in question.like_users.all %}
     
@@ -36,3 +37,5 @@
     {% endif %}
     {{ question.like_users.all|length }}
   </form>
+</div>
+{% endblock %}
