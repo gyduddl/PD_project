@@ -1,19 +1,32 @@
 {% extends 'base.html' %}
 {% block content %}
+<a href="/polls/" class="btn btn-primary">메인페이지로 넘어가기</a>
 <h1>{{ question.question_Text }}</h1>
 
-<ul>
+<ul class="list-unstyled">
     {% csrf_token %}
-    {% for choice in question.choice_set.all %}
-    <li>{{ choice.choice_text }} -- {{ choice.votes }} vote{{ choice.votes | pluralize }}</li>
+    {% for choice in choices %}
+        <li class="mb-4">
+            <strong>{{ choice.choice_text }}</strong> — votes ({{ choice.percentage }}%)
+            <div class="progress" style="width:50%; height: 20px; margin-top: 8px;">
+                <div 
+                    class="progress-bar bg-success" 
+                    role="progressbar" 
+                    style="width:{{ choice.percentage }}%;"
+                    aria-valuenow="{{ choice.percentage }}" 
+                    aria-valuemin="0" 
+                    aria-valuemax="100">
+                    {{ choice.percentage }}%
+                </div>
+            </div>
+        </li>
     {% endfor %}
 </ul>
 
 <form action="{% url 'polls:reset' question.id %}" method="post">
     {% csrf_token %}
-    <input type="hidden" name="choice" value="{{ question.choice_set.all }}">
-    <button type="submit">Reset Votes</button>
+    <button type="submit" class="btn btn-danger">Reset Votes</button>
 </form>
 
-<a href="{% url 'polls:detail' question.id %}" class="btn btn-primary">vote again?</a>
+<a href="{% url 'polls:detail' question.id %}" class="btn btn-primary mt-3">Vote Again?</a>
 {% endblock %}

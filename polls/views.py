@@ -18,7 +18,24 @@ def detail(request, question_id): # 상세 페이지
 
 def results(request, question_id): # 결과 페이지
     question = get_object_or_404(Question, pk=question_id)
-    return render(request, 'polls/results.html', {'question':question})
+    choices = question.choice_set.all()
+    total_votes = sum(choice.votes for choice in choices)
+    choices_with_percentage = []
+    for choice in choices:
+        if total_votes > 0:
+            percentage = (choice.votes / total_votes) * 100
+        else:
+            percentage = 0
+        choices_with_percentage.append({
+            'choice_text': choice.choice_text,
+            'votes': choice.votes,
+            'percentage': round(percentage, 2),  # 소수점 둘째 자리까지
+        })
+    return render(request, 'polls/results.html', {
+        'question': question,
+        'choices': choices_with_percentage,
+        'total_votes': total_votes,
+    })
 
 def vote(request, question_id): # 투표기능
     question = get_object_or_404(Question, pk=question_id)
