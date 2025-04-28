@@ -78,8 +78,7 @@ def create(request):
             choice1_image = form.cleaned_data.get('choice_1_img')
             choice2_text = form.cleaned_data.get('choice2')
             choice2_image = form.cleaned_data.get('choice_2_img')
-            print(choice1_image)
-            print("2",choice2_image)
+
             Choice.objects.create(question=question, choice_text=choice1_text, image=choice1_image)
             Choice.objects.create(question=question, choice_text=choice2_text, image=choice2_image)
 
@@ -109,23 +108,30 @@ def update(request, question_id):
         return HttpResponseForbidden("You are not authorized to edit this post.")
 
     if request.method == 'POST':
-        form = QuestionForm(request.POST)
+        form = QuestionForm(request.POST, request.FILES)
         if form.is_valid():
+            question.user = request.user
             question.question_Text = form.cleaned_data.get('question_Text')
             question.pub_date = timezone.now()
             question.save()
 
             choice1_text = form.cleaned_data.get('choice1')
+            choice1_image = form.cleaned_data.get('choice_1_img')
             choice2_text = form.cleaned_data.get('choice2')
+            choice2_image = form.cleaned_data.get('choice_2_img')
 
-            choices = question.choice_set.all()
+            choices = question.choice_set.all().order_by('id')
 
             if len(choices) >= 1:
                 choices[0].choice_text = choice1_text
+                if choice1_image:
+                    choices[0].image = choice1_image
                 choices[0].save()
 
             if len(choices) >= 2:
                 choices[1].choice_text = choice2_text
+                if choice2_image:
+                    choices[1].image = choice2_image
                 choices[1].save()
 
             return redirect('polls:detail', question_id=question.id)
@@ -134,7 +140,7 @@ def update(request, question_id):
         initial_data = {
             'question_Text': question.question_Text,
         }
-        choices = question.choice_set.all()
+        choices = question.choice_set.all().order_by('id')
         if len(choices) >= 1:
             initial_data['choice1'] = choices[0].choice_text
         if len(choices) >= 2:

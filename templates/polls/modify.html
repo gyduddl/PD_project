@@ -1,33 +1,83 @@
-{% extends 'base.html' %}
-{% block content %}
+{% extends 'base.html' %} {% block content %}
 <div class="container">
     <h5 class="my-3 border-bottom pb-2">질문수정</h5>
-    <form action="{% url 'polls:update' question.id %}" method="post">   
-        {% csrf_token %}
-        {% if form.errors %}
+    <form action="{% url 'polls:update' question.id %}" method="post">
+        {% csrf_token %} {% if form.errors %}
         <div class="alert alert-danger" role="alert">
-            {% for field in form %}
-            {% if field.errors %}
+            {% for field in form %} {% if field.errors %}
             <div>
                 <strong>{{ field.label }}</strong>
                 {{ field.errors }}
             </div>
-            {% endif %}
-            {% endfor %}
+            {% endif %} {% endfor %}
         </div>
         {% endif %}
         <div class="mb-3">
             <label for="question_Text" class="form-label">제목</label>
-            <textarea class="form-control" type="text" placeholder="제목" name="question_Text" id="question_Text" value="{{ form.subject.value|default_if_none:'' }}">{{ question.question_Text|default_if_none:''}}</textarea> <!-- question_Text -->
-        <div class="mb-3">
-            <label for="choice1" class="form-label">선택지 1</label>
-            <textarea rows="5" style="margin-bottom: 10px;" class="form-control" name="choice1" id="choice1" placeholder="선택지 1">{{ question.choice_set.all.0.choice_text|default_if_none:'' }}</textarea>  <!-- choice_Text -->
-            <label for="choice2" class="form-label">선택지 2</label>
-            <textarea rows="5" style="margin-bottom: 10px;" class="form-control" name="choice2" id="choice2" placeholder="선택지 2">{{ question.choice_set.all.1.choice_text|default_if_none:'' }}</textarea> 
-        </div>
-        <button type="submit" class="btn btn-primary">수정하기</button>
-        </div>
+            <textarea
+                class="form-control"
+                type="text"
+                placeholder="제목"
+                name="question_Text"
+                id="question_Text"
+                value="{{ form.subject.value|default_if_none:'' }}"
+            >
+{{ question.question_Text|default_if_none:''}}</textarea
+            >
+            <!-- question_Text -->
+            <div class="mb-3">
+                <label for="choice1" class="form-label">선택지 1</label>
+                <textarea
+                    rows="5"
+                    style="margin-bottom: 10px"
+                    class="form-control"
+                    name="choice1"
+                    id="choice1"
+                    placeholder="선택지 1"
+                >
+{{ question.choice_set.all.0.choice_text|default_if_none:'' }}</textarea
+                >
+                <!-- choice_Text -->
+                <label for="choice_1_img" class="form-label">선택지 1 사진</label>
+                <div class="mb-3">
+                    {% if question.choice_set.all.0.image %}
+                    <label for="choice_1_img" class="form-label">
+                        현재 사진: {{ question.choice_set.all.0.image.name }}
+                    </label>
+                    {% endif %}
 
+                    <br />
+
+                    수정 사진: <input type="file" class="form-control" name="choice_1_img" id="choice_1_img" />
+                </div>
+                <!-- 선택지 2 -->
+                <label for="choice2" class="form-label">선택지 2</label>
+                <textarea
+                    rows="5"
+                    style="margin-bottom: 10px"
+                    class="form-control"
+                    name="choice2"
+                    id="choice2"
+                    placeholder="선택지 2"
+                >
+{{ question.choice_set.all.1.choice_text|default_if_none:'' }}</textarea
+                >
+                <label for="choice_2_img" class="form-label">선택지 2 사진</label>
+                <div class="mb-3">
+                    {% if question.choice_set.all.1.image %}
+                    <label for="choice_2_img" class="form-label">
+                        현재 사진: {{ question.choice_set.all.1.image.name }}
+                    </label>
+                    {% endif %}
+
+                    <br />
+
+                    수정 사진: <input type="file" class="form-control" name="choice_2_img" id="choice_2_img" />
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">수정하기</button>
+            <a class="btn btn-primary" href="{% url 'polls:detail' question.id %}">돌아가기</a>
+        </div>
 
         <!-- <p> <textarea name="title" placeholder="{{ question.question_Text }}" >{{question.question_Text}}</textarea></p>
         <p> <textarea name="choice1" placeholder="첫번째 선택지">{{question.choice_set.all.0.choice_text}}</textarea></p>
