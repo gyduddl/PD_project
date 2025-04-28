@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="container">
-    <h5 class="my-3 border-bottom pb-2">질문등록</h5>
-<form action="{% url 'polls:create' %}" method="post">
+    <h2 class="my-3 border-bottom pb-2">질문등록</h2>
+<form action="{% url 'polls:create' %}" method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {% if form.errors %}
     <div class="alert alert-danger" role="alert">
@@ -17,13 +17,21 @@
     </div>
     {% endif %}
     <div class="mb-3">
-        <label for="question_Text" class="form-label">제목</label>
+        <label for="question_Text" class="form-label"><h5>제목</h5></label>
         <input class="form-control" type="text" placeholder="title" name="question_Text" id="question_Text" value="{{ form.subject.value|default_if_none:'' }}"> <!-- question_Text -->
-    <div class="mb-3">
-        <label for="choice1" class="form-label">선택지 1</label>
-        <textarea rows="5" style="margin-bottom: 10px;" class="form-control" name="choice1" id="choice1" placeholder="첫번째 선택지">{{ form.content.value|default_if_none:'' }}</textarea> 
-        <label for="choice2" class="form-label">선택지 2</label>
-        <textarea rows="5" style="margin-bottom: 10px;" class="form-control" name="choice2" id="choice2" placeholder="두번째 선택지">{{ form.content.value|default_if_none:'' }}</textarea> 
+        <br>
+        <div class="mb-3">
+        <!-- 선텍지 1 -->
+        <label for="choice1" class="form-label"><h5>선택지 1</h5></label>
+        <textarea rows="5" style="margin-bottom: 10px;" class="form-control" name="choice1" id="choice1" placeholder="첫번째 선택지">{{ form.content.value|default_if_none:'' }}</textarea>
+        <label for="choice_1_img" class="form-label">선택지 1 사진</label>
+        <input type="file" class="form-control" name="choice_1_img" id="choice_1_img"> 
+        <!-- 선택지 2 -->
+        <br>
+        <label for="choice2" class="form-label"><h5>선택지 2</h5></label>
+        <textarea rows="5" style="margin-bottom: 10px;" class="form-control" name="choice2" id="choice2" placeholder="두번째 선택지">{{ form.content.value|default_if_none:'' }}</textarea>
+        <label for="choice_2_img" class="form-label">선택지 2 사진</label>
+        <input type="file" class="form-control" name="choice_2_img" id="choice_2_img">  
     </div>
     <button type="submit" class="btn btn-primary">저장하기</button>
     </div>

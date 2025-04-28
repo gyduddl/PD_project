@@ -11,6 +11,9 @@
 {% csrf_token %}
 {% for choice in question.choice_set.all %} <!--question 객체에 연결된 모든 choice(선택지)를 가져옴. -->
     <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}"> <!-- id:키값-->
+    {% if choice.image %}
+    <img src="{{ choice.image.url }}" alt="Choice Image" style="max-width: 100%; height: auto; margin-top: 10px;">
+    {% endif %}
     <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br>
 {% endfor %}
 <input type="submit" value="Vote">

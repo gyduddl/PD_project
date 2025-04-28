@@ -66,7 +66,7 @@ def likes(request, question_id): #좋아요 기능
 
 def create(request):
     if request.method == 'POST':
-        form = QuestionForm(request.POST)
+        form = QuestionForm(request.POST, request.FILES)
         if form.is_valid():
             question = form.save(commit=False)
             question.user = request.user
@@ -75,9 +75,13 @@ def create(request):
 
             # choice1, choice2는 별도로 생성
             choice1_text = form.cleaned_data.get('choice1')
+            choice1_image = form.cleaned_data.get('choice_1_img')
             choice2_text = form.cleaned_data.get('choice2')
-            Choice.objects.create(question=question, choice_text=choice1_text)
-            Choice.objects.create(question=question, choice_text=choice2_text)
+            choice2_image = form.cleaned_data.get('choice_2_img')
+            print(choice1_image)
+            print("2",choice2_image)
+            Choice.objects.create(question=question, choice_text=choice1_text, image=choice1_image)
+            Choice.objects.create(question=question, choice_text=choice2_text, image=choice2_image)
 
             return redirect('polls:detail', question_id=question.id)
     else:

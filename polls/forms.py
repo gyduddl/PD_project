@@ -7,10 +7,21 @@ class QuestionForm(forms.ModelForm):
         max_length=200,
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
+
+    choice1_image = forms.ImageField(
+        label = "choice_1_img",
+        required = False
+    )
+
     choice2 = forms.CharField(
         label='choice2',
         max_length=200,
         widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+
+    choice2_image = forms.ImageField(
+        label = "choice_2_img",
+        required = False
     )
 
     class Meta:
