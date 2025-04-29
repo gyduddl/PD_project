@@ -8,7 +8,7 @@ class QuestionForm(forms.ModelForm):
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
 
-    choice1_image = forms.ImageField(
+    choice_1_img = forms.ImageField(
         label = "choice_1_img",
         required = False
     )
@@ -19,7 +19,7 @@ class QuestionForm(forms.ModelForm):
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
 
-    choice2_image = forms.ImageField(
+    choice_2_img = forms.ImageField(
         label = "choice_2_img",
         required = False
     )

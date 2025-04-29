@@ -110,7 +110,6 @@ def update(request, question_id):
     if request.method == 'POST':
         form = QuestionForm(request.POST, request.FILES)
         if form.is_valid():
-            question.user = request.user
             question.question_Text = form.cleaned_data.get('question_Text')
             question.pub_date = timezone.now()
             question.save()
@@ -119,6 +118,7 @@ def update(request, question_id):
             choice1_image = form.cleaned_data.get('choice_1_img')
             choice2_text = form.cleaned_data.get('choice2')
             choice2_image = form.cleaned_data.get('choice_2_img')
+            print(choice1_image)
 
             choices = question.choice_set.all().order_by('id')
 
