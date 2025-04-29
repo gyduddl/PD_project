@@ -13,9 +13,9 @@ urlpatterns = [
     path('<int:question_id>/reset/', views.reset, name='reset'),
     path('<int:question_id>/likes/', views.likes, name='likes'),
     path('new/', TemplateView.as_view(template_name="polls/new.html"), name='new'),
-    path('mypage/', TemplateView.as_view(template_name="polls/mypage.html"), name='mypage'),
     path('create/', views.create, name='create'),
     path('delete/<int:question_id>/', views.delete, name='delete'),
     path('<int:question_id>/modify/', views.modify, name='modify'),
     path('update/<int:question_id>/', views.update, name='update'),
+    path('mypage/', views.mypage, name='mypage'),
 ]

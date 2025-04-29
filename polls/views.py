@@ -151,4 +151,12 @@ def update(request, question_id):
     context = {'form': form, 'question': question}
     return render(request, 'polls/modify.html', context)
 
+def mypage(request):
+    user_questions = Question.objects.filter(user=request.user).order_by('-pub_date')
+    liked_questions = Question.objects.filter(like_users=request.user).order_by('-pub_date')
+    context = {'user_questions': user_questions, 'liked_questions': liked_questions}
+    print(liked_questions)
+    return render(request, 'polls/mypage.html', context)
+
+
 
